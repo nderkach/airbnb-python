@@ -3,7 +3,6 @@ import json
 
 
 API_URL = "https://api.airbnb.com"
-# API_KEY might be tied to a particular app installation, use with caution
 API_KEY = "915pw2pnf4h1aiguhph5gc5b2"
 
 
@@ -28,10 +27,8 @@ class Api(object):
     >>> api = Api(uid=25418725, access_token="c9pfdtaakmqh8vrwcyviaai0w")
     """
 
-    def __init__(self, username=None, password=None,
-                 uid=None, access_token=None, api_key=API_KEY):
+    def __init__(self, username=None, password=None, uid=None, access_token=None, api_key=API_KEY):
         self._session = requests.Session()
-
         self._session.headers = {
             "Accept": "application/json",
             "Accept-Encoding": "gzip, deflate",
@@ -81,7 +78,14 @@ class Api(object):
         r.raise_for_status()
 
         return r.json()
+        
+    def get_room(self, roomid):
+        assert(self._access_token and self.uid)
 
+        r = self._session.get(API_URL + "/v1/listings/" + str(roomid))
+        r.raise_for_status()
+
+        return r.json()
 
 if __name__ == "__main__":
     import doctest
