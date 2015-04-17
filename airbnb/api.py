@@ -27,7 +27,8 @@ class Api(object):
     >>> api = Api(uid=25418725, access_token="c9pfdtaakmqh8vrwcyviaai0w")
     """
 
-    def __init__(self, username=None, password=None, uid=None, access_token=None, api_key=API_KEY):
+    def __init__(self, username=None, password=None, 
+                 uid=None, access_token=None, api_key=API_KEY):
         self._session = requests.Session()
         self._session.headers = {
             "Accept": "application/json",

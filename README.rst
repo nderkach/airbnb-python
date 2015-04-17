@@ -6,7 +6,7 @@ Airbnb Python API
 Disclaimer
 ----------
 
-This is a unofficial python API wrapper for airbnb.com. 
+This is a unofficial python API wrapper for airbnb.com
 
 Using this software might contradict airbnb.com terms of service
 
@@ -17,16 +17,15 @@ Requirements
 
 Usage:
 ------
-* In order to build the API, use:
 
-	python setup.py install
+	pip install airbnb-python
 
 * Initialize API with your airbnb.com username and password::
 
 	from airbnb import Api
 	api = Api(login, password)
 
-* Get you user profile:
+* Get you user profile::
 
 	api.get_profile()
 
