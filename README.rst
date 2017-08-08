@@ -28,6 +28,10 @@ Usage:
 * Get you user profile::
 
 	api.get_profile()
+
+* Get information about a room::
+    
+    api.get_room(roomid)
 	
 .. image:: https://travis-ci.org/nderkach/airbnb-python.png
     :target: https://travis-ci.org/nderkach/airbnb-python
