@@ -4,7 +4,7 @@ import os
 from distutils.core import setup
 
 PROJECT = 'airbnb'
-VERSION = '2.0.0'
+VERSION = '2.0.1'
 URL = 'https://github.com/nderkach/airbnb-python'
 AUTHOR = 'Nikolay Derkach'
 AUTHOR_EMAIL = 'nderk@me.com'

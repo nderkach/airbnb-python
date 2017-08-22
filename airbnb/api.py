@@ -1,5 +1,6 @@
 import requests
 import json
+from datetime import datetime
 
 
 API_URL = "https://api.airbnb.com/v2"
@@ -20,7 +21,7 @@ class Api(object):
     144993238
     >>> api.get_profile() # doctest: +ELLIPSIS
     {...}
-    >>> api.get_room(1298200) # doctest: +ELLIPSIS
+    >>> api.get_calendar(975964) # doctest: +ELLIPSIS
     {...}
     >>> api = Api("foo", "bar") # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
@@ -94,10 +95,10 @@ class Api(object):
 
         return r.json()
 
-    def get_room(self, roomid):
+    def get_calendar(self, listing_id, starting_month=datetime.now().month, starting_year=datetime.now().year, calendar_months=12):
         assert(self._access_token and self.uid)
 
-        r = self._session.get(API_URL + "/listings/" + str(roomid))
+        r = self._session.get(API_URL + "/calendar_months?year={}&listing_id={}&_format=with_conditions&count={}&month={}".format(starting_year, listing_id, calendar_months, starting_month))
         r.raise_for_status()
 
         return r.json()
