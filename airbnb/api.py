@@ -23,6 +23,8 @@ class Api(object):
     {...}
     >>> api.get_calendar(975964) # doctest: +ELLIPSIS
     {...}
+    >>> api.get_reviews(975964) # doctest: +ELLIPSIS
+    {...}
     >>> api = Api("foo", "bar") # doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
     ...
@@ -99,6 +101,23 @@ class Api(object):
         assert(self._access_token and self.uid)
 
         r = self._session.get(API_URL + "/calendar_months?year={}&listing_id={}&_format=with_conditions&count={}&month={}".format(starting_year, listing_id, calendar_months, starting_month))
+        r.raise_for_status()
+
+        return r.json()
+
+    def get_reviews(self, listing_id, offset=0, limit=20):
+        assert(self._access_token and self.uid)
+
+        params = {
+            '_order': 'language_country',
+            'listing_id': str(listing_id),
+            '_offset': str(offset),
+            'role': 'all',
+            '_limit': str(limit),
+            '_format': 'for_mobile_client',
+        }
+
+        r = self._session.get(API_URL + "/reviews", params=params)
         r.raise_for_status()
 
         return r.json()
