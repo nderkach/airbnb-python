@@ -1,6 +1,7 @@
 import requests
 import json
 from datetime import datetime
+from airbnb.random_request import RandomRequest
 
 
 API_URL = "https://api.airbnb.com/v2"
@@ -42,12 +43,12 @@ class Api(object):
             "Accept-Encoding": "gzip, deflate",
             "Content-Type": "application/json",
             "X-Airbnb-API-Key": api_key,
-            "User-Agent": "Airbnb/17.31 iPhone/9.2.1 Type/Phone",
-            "X-Airbnb-Device-ID": "721ea97f85b866292abd3dffaf57b87d8c0ce1ee",  # TODO: randomize
-            "X-Airbnb-Advertising-ID": "30343C53-B54B-4BDD-9CAD-8DBA3B858BD4",  # TODO: randomize
-            "X-Airbnb-Carrier-Name": "T-Mobile", # TODO: randomize
-            "X-Airbnb-Network-Type": "wifi", # TODO: randomize
-            "X-Airbnb-Currency": "USD" # TODO: randomize
+            "User-Agent": RandomRequest().get_random_user_agent(),
+            "X-Airbnb-Device-ID": RandomRequest().get_random_udid(),
+            "X-Airbnb-Advertising-ID": RandomRequest().get_random_uuid(),
+            "X-Airbnb-Carrier-Name": "T-Mobile",  # TODO: randomize
+            "X-Airbnb-Network-Type": "wifi",  # TODO: randomize
+            "X-Airbnb-Currency": "USD"  # TODO: randomize
         }
 
         if uid and access_token:
@@ -100,7 +101,15 @@ class Api(object):
     def get_calendar(self, listing_id, starting_month=datetime.now().month, starting_year=datetime.now().year, calendar_months=12):
         assert(self._access_token and self.uid)
 
-        r = self._session.get(API_URL + "/calendar_months?year={}&listing_id={}&_format=with_conditions&count={}&month={}".format(starting_year, listing_id, calendar_months, starting_month))
+        params = {
+            'year': str(starting_year),
+            'listing_id': str(listing_id),
+            '_format': 'with_conditions',
+            'count': str(calendar_months),
+            'month': str(starting_month)
+        }
+
+        r = self._session.get(API_URL + "/calendar_months", params=params)
         r.raise_for_status()
 
         return r.json()
