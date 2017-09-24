@@ -18,20 +18,26 @@ Requirements
 Usage:
 ------
 
-	pip install airbnb-python
+    pip install airbnb-python
 
-Initialize API with your airbnb.com username and password:
+### Initialize API with your airbnb.com username and password:
 
+```python
 from airbnb import Api
 api = Api(login, password)
+```
 
-Get you user profile:
+### Get you user profile
 
+```python
 api.get_profile()
+```
 
-Get listing availability:
-    
+### Get listing availability
+
+```python
 api.get_calendar(listing_id)
+```
 
 Optional parameters:
 
@@ -41,9 +47,26 @@ Optional parameters:
 
 Example:
 
+```python
 api.get_calendar(975964, starting_month=9, starting_year=2017, calendar_months=1)
+```
+
+### Get listing reviews
+ 
+```python
+api.get_reviews(listing_id)
+```
+
+Optional parameters:
+
+- `offset`: paging offset
+- `limit`: number of results per page
+
+Example:
+
+```python
+api.get_reviews(975964, offset=20, limit=20)
+```
 
 
-	
-.. image:: https://travis-ci.org/nderkach/airbnb-python.png
-    :target: https://travis-ci.org/nderkach/airbnb-python
+[![Build Status](https://travis-ci.org/nderkach/airbnb-python.svg)](https://travis-ci.org/nderkach/airbnb-python)
