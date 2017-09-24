@@ -4,7 +4,7 @@ import os
 from distutils.core import setup
 
 PROJECT = 'airbnb'
-VERSION = '2.0.6'
+VERSION = '2.0.9'
 URL = 'https://github.com/nderkach/airbnb-python'
 AUTHOR = 'Nikolay Derkach'
 AUTHOR_EMAIL = 'nderk@me.com'
@@ -27,9 +27,7 @@ setup(
     url=URL,
     license=read_file('LICENSE'),
     packages=['airbnb'],
-    test_suite="tests",
-    data_files = [('', ['LICENSE'])],
-    include_package_data = True,
+    package_data = {'airbnb': ["files/*"]},
     classifiers=[
         "Programming Language :: Python",
         "Topic :: Software Development :: Libraries :: Python Modules",

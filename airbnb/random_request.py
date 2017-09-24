@@ -9,9 +9,9 @@ class RandomRequest(object):
         pass
 
     def get_random_user_agent(self):
-        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'supported_ios_versions.txt')) as f:
+        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'files/supported_ios_versions.txt')) as f:
             ios_versions = f.read().splitlines()
-        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'airbnb_versions.txt')) as f:
+        with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), 'files/airbnb_versions.txt')) as f:
             airbnb_versions = f.read().splitlines()
 
         return "Airbnb/{} iPhone/{} Type/Phone".format(random.choice(airbnb_versions), random.choice(ios_versions))
