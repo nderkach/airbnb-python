@@ -2,6 +2,7 @@ import requests
 import json
 from datetime import datetime
 from airbnb.random_request import RandomRequest
+import os
 
 
 API_URL = "https://api.airbnb.com/v2"
@@ -14,10 +15,16 @@ class AuthError(Exception):
     """
     pass
 
+class VerificationError(AuthError):
+    """
+    Authentication error
+    """
+    pass
+
 
 class Api(object):
     """ Base API class
-    >>> api = Api("airbnb@sharklasers.com", "qwerty1234")
+    >>> api = Api(os.environ.get("AIRBNB_LOGIN"), os.environ.get("AIRBNB_PASSWORD"), proxy=os.environ.get("PROXY"))
     >>> api.uid
     144993238
     >>> api.get_profile() # doctest: +ELLIPSIS
@@ -35,7 +42,8 @@ class Api(object):
     """
 
     def __init__(self, username=None, password=None,
-                 uid=None, access_token=None, api_key=API_KEY, session_cookie=None):
+                 uid=None, access_token=None, api_key=API_KEY, session_cookie=None,
+                 proxy=None):
         self._session = requests.Session()
 
         self._session.headers = {
@@ -43,13 +51,21 @@ class Api(object):
             "Accept-Encoding": "gzip, deflate",
             "Content-Type": "application/json",
             "X-Airbnb-API-Key": api_key,
-            "User-Agent": RandomRequest().get_random_user_agent(),
-            "X-Airbnb-Device-ID": RandomRequest().get_random_udid(),
-            "X-Airbnb-Advertising-ID": RandomRequest().get_random_uuid(),
-            "X-Airbnb-Carrier-Name": "T-Mobile",  # TODO: randomize
-            "X-Airbnb-Network-Type": "wifi",  # TODO: randomize
-            "X-Airbnb-Currency": "USD"  # TODO: randomize
+            "User-Agent": "Airbnb/17.37 iPhone/9.2.1 Type/Phone",
+            "X-Airbnb-Device-ID": "29c19985de1058c36aa5c4b81100216673565ff2",
+            "X-Airbnb-Advertising-ID": "BA06DDF4-FEF3-46F6-BD28-DB31FB1C830D",
+            "X-Airbnb-Carrier-Name": "T-Mobile",
+            "X-Airbnb-Network-Type": "wifi",
+            "X-Airbnb-Currency": "USD",
+            "X-Airbnb-Locale": "en",
+            "X-Airbnb-Carrier-Country": "us"
         }
+
+        if proxy:
+            self._session.proxies = {
+                "http": proxy,
+                "https": proxy
+            }
 
         if uid and access_token:
             self.uid = uid
@@ -74,9 +90,10 @@ class Api(object):
                 API_URL + "/logins", data=json.dumps(login_payload)
             )
 
-            if "login" not in r.json():
+            if r.status_code == 420:
+                raise VerificationError
+            elif r.status_code == 403:
                 raise AuthError
-            r.raise_for_status()
 
             self._access_token = r.json()["login"]["id"]
 
