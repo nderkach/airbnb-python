@@ -25,8 +25,6 @@ class VerificationError(AuthError):
 class Api(object):
     """ Base API class
     >>> api = Api(os.environ.get("AIRBNB_LOGIN"), os.environ.get("AIRBNB_PASSWORD"), proxy=os.environ.get("PROXY"))
-    >>> api.uid
-    144993238
     >>> api.get_profile() # doctest: +ELLIPSIS
     {...}
     >>> api.get_calendar(975964) # doctest: +ELLIPSIS
@@ -37,12 +35,11 @@ class Api(object):
     Traceback (most recent call last):
     ...
     AuthError
-    >>> api = Api(uid=144993238, access_token="3jfmqfzmuwjaxb7wrgctyq3hs")
-    >>> api = Api(uid=144993238, access_token="3jfmqfzmuwjaxb7wrgctyq3hs", session_cookie="_airbed_session_id=1aa1c70c9b0893aadd9f1343a85fd782")
+    >>> api = Api(access_token="bj8tp4gn0g26ype6dhysa4o9a")
+    >>> api = Api(access_token="bj8tp4gn0g26ype6dhysa4o9a", session_cookie="_airbed_session_id=1aa1c70c9b0893aadd9f1343a85fd782")
     """
 
-    def __init__(self, username=None, password=None,
-                 uid=None, access_token=None, api_key=API_KEY, session_cookie=None,
+    def __init__(self, username=None, password=None, access_token=None, api_key=API_KEY, session_cookie=None,
                  proxy=None):
         self._session = requests.Session()
 
@@ -67,8 +64,7 @@ class Api(object):
                 "https": proxy
             }
 
-        if uid and access_token:
-            self.uid = uid
+        if access_token:
             self._access_token = access_token
 
             if session_cookie and "_airbed_session_id=" in session_cookie:
@@ -101,14 +97,8 @@ class Api(object):
                 "X-Airbnb-OAuth-Token": self._access_token
             })
 
-            r = self._session.get(API_URL + "/logins/me")
-
-            r.raise_for_status()
-
-            self.uid = r.json()["login"]["account"]["id"]
-
     def get_profile(self):
-        assert(self._access_token and self.uid)
+        assert(self._access_token)
 
         r = self._session.get(API_URL + "/logins/me")
         r.raise_for_status()
@@ -116,7 +106,7 @@ class Api(object):
         return r.json()
 
     def get_calendar(self, listing_id, starting_month=datetime.now().month, starting_year=datetime.now().year, calendar_months=12):
-        assert(self._access_token and self.uid)
+        assert(self._access_token)
 
         params = {
             'year': str(starting_year),
@@ -132,7 +122,7 @@ class Api(object):
         return r.json()
 
     def get_reviews(self, listing_id, offset=0, limit=20):
-        assert(self._access_token and self.uid)
+        assert(self._access_token)
 
         params = {
             '_order': 'language_country',
