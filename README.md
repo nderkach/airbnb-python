@@ -18,7 +18,7 @@ Requirements
 Usage:
 ------
 
-    pip install airbnb-python
+    pip install airbnb
 
 ### Initialize API with your airbnb.com username and password:
 
