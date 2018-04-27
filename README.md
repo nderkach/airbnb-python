@@ -23,8 +23,8 @@ Usage:
 ### Initialize API with your airbnb.com username and password:
 
 ```python
-from airbnb import Api
-api = Api(login, password)
+import airbnb
+api = airbnb.Api(login, password)
 ```
 
 ### Get you user profile
@@ -67,6 +67,13 @@ Example:
 ```python
 api.get_reviews(975964, offset=20, limit=20)
 ```
+
+### VerificationError (420)
+
+This exception occurs when you send too many login requests (i.e. call `Api()` with yout credentials).
+Once you are logged in with your credentials you can just use your access token (`Api(access_token="<TOKEN>")`)
+As a workaround, try to login manually though the website or mobile app and complete Airbnb's verification process.
+You can also try to use a VPN or a proxy.
 
 
 [![Build Status](https://travis-ci.org/nderkach/airbnb-python.svg)](https://travis-ci.org/nderkach/airbnb-python)

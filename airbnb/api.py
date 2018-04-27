@@ -35,8 +35,7 @@ class Api(object):
     Traceback (most recent call last):
     ...
     AuthError
-    >>> api = Api(access_token="bj8tp4gn0g26ype6dhysa4o9a")
-    >>> api = Api(access_token="bj8tp4gn0g26ype6dhysa4o9a", session_cookie="_airbed_session_id=1aa1c70c9b0893aadd9f1343a85fd782")
+    >>> api = Api(access_token="6kvcgu12my4myghr6ltcl1zna")
     """
 
     def __init__(self, username=None, password=None, access_token=None, api_key=API_KEY, session_cookie=None,
@@ -92,6 +91,8 @@ class Api(object):
                 raise AuthError
 
             self._access_token = r.json()["login"]["id"]
+
+            print("Your access token: {}".format(self._access_token))
 
             self._session.headers.update({
                 "X-Airbnb-OAuth-Token": self._access_token
