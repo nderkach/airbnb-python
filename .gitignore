@@ -42,3 +42,4 @@ venv2.7
 .pypirc
 
 .DS_Store
+.env
