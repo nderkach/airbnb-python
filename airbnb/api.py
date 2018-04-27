@@ -1,6 +1,6 @@
 import requests
 import json
-from datetime import datetime
+import datetime
 from airbnb.random_request import RandomRequest
 import os
 
@@ -15,6 +15,7 @@ class AuthError(Exception):
     """
     pass
 
+
 class VerificationError(AuthError):
     """
     Authentication error
@@ -24,17 +25,14 @@ class VerificationError(AuthError):
 
 class Api(object):
     """ Base API class
-    >>> api = Api(os.environ.get("AIRBNB_LOGIN"), os.environ.get("AIRBNB_PASSWORD"), proxy=os.environ.get("PROXY"))
+    >>> api = Api(os.environ.get("AIRBNB_LOGIN"), os.environ.get("AIRBNB_PASSWORD"), proxy=os.environ.get("PROXY")) # doctest: +ELLIPSIS
+    {...}
     >>> api.get_profile() # doctest: +ELLIPSIS
     {...}
     >>> api.get_calendar(975964) # doctest: +ELLIPSIS
     {...}
     >>> api.get_reviews(975964) # doctest: +ELLIPSIS
     {...}
-    >>> api = Api("foo", "bar") # doctest: +IGNORE_EXCEPTION_DETAIL
-    Traceback (most recent call last):
-    ...
-    AuthError
     >>> api = Api(access_token="6kvcgu12my4myghr6ltcl1zna")
     """
 
@@ -106,7 +104,7 @@ class Api(object):
 
         return r.json()
 
-    def get_calendar(self, listing_id, starting_month=datetime.now().month, starting_year=datetime.now().year, calendar_months=12):
+    def get_calendar(self, listing_id, starting_month=datetime.datetime.now().month, starting_year=datetime.datetime.now().year, calendar_months=12):
         assert(self._access_token)
 
         params = {
@@ -135,6 +133,39 @@ class Api(object):
         }
 
         r = self._session.get(API_URL + "/reviews", params=params)
+        r.raise_for_status()
+
+        return r.json()
+
+    def get_listings(self, user_id, offset=0, limit=50):
+        assert(self._access_token)
+
+        params = {
+            'has_availability': 'true',
+            'format': 'v1_legacy_short',
+            'user_id': str(user_id),
+            '_limit': str(limit),
+            '_offset': str(offset)
+        }
+
+        r = self._session.get(API_URL + "/listings", params=params)
+        r.raise_for_status()
+
+        return r.json()
+
+    def get_listing_calendar(self, listing_id, starting_date=datetime.datetime.now(), calendar_months=6):
+        assert(self._access_token)
+
+        params = {
+            '_format': 'host_calendar_detailed'
+        }
+
+        starting_date_str = starting_date.strftime("%Y-%m-%d")
+        ending_date_str = (
+            starting_date + datetime.timedelta(days=30)).strftime("%Y-%m-%d")
+
+        r = self._session.get(API_URL + "/calendars/{}/{}/{}".format(
+            str(listing_id), starting_date_str, ending_date_str), params=params)
         r.raise_for_status()
 
         return r.json()
