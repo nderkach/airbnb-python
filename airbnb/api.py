@@ -26,7 +26,7 @@ class VerificationError(AuthError):
 class Api(object):
     """ Base API class
     >>> api = Api(os.environ.get("AIRBNB_LOGIN"), os.environ.get("AIRBNB_PASSWORD"), proxy=os.environ.get("PROXY")) # doctest: +ELLIPSIS
-    {...}
+    Your access token: ...
     >>> api.get_profile() # doctest: +ELLIPSIS
     {...}
     >>> api.get_calendar(975964) # doctest: +ELLIPSIS
