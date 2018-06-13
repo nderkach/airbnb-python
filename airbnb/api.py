@@ -41,18 +41,19 @@ class Api(object):
         self._session = requests.Session()
 
         self._session.headers = {
-            "Accept": "application/json",
-            "Accept-Encoding": "gzip, deflate",
-            "Content-Type": "application/json",
-            "X-Airbnb-API-Key": api_key,
-            "User-Agent": "Airbnb/17.37 iPhone/9.2.1 Type/Phone",
-            "X-Airbnb-Device-ID": "29c19985de1058c36aa5c4b81100216673565ff2",
-            "X-Airbnb-Advertising-ID": "BA06DDF4-FEF3-46F6-BD28-DB31FB1C830D",
-            "X-Airbnb-Carrier-Name": "T-Mobile",
-            "X-Airbnb-Network-Type": "wifi",
-            "X-Airbnb-Currency": "USD",
-            "X-Airbnb-Locale": "en",
-            "X-Airbnb-Carrier-Country": "us"
+            "accept": "application/json",
+            "accept-encoding": "gzip, deflate",
+            "content-type": "application/json",
+            "x-airbnb-api-key": api_key,
+            "user-agent": "Airbnb/18.23 AppVersion/18.23 iPhone/12.0 Type/Phone",
+            "x-airbnb-device-id": "9120210f8fb1ae837affff54a0a2f64da821d227",
+            "x-airbnb-advertising-id": "16CE6BF7-90CC-41A8-8305-B7B3183A2787",
+            "x-airbnb-carrier-name": "T-Mobile",
+            "x-airbnb-network-type": "wifi",
+            "x-airbnb-currency": "USD",
+            "x-airbnb-locale": "en",
+            "x-airbnb-carrier-country": "us",
+            "accept-language": "en-us"
         }
 
         if proxy:
@@ -70,7 +71,7 @@ class Api(object):
                 })
 
             self._session.headers.update({
-                "X-Airbnb-OAuth-Token": self._access_token
+                "x-airbnb-oauth-token": self._access_token
             })
 
         else:
@@ -93,7 +94,7 @@ class Api(object):
             print("Your access token: {}".format(self._access_token))
 
             self._session.headers.update({
-                "X-Airbnb-OAuth-Token": self._access_token
+                "x-airbnb-oauth-token": self._access_token
             })
 
     def get_profile(self):
