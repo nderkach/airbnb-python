@@ -171,6 +171,22 @@ class Api(object):
 
         return r.json()
 
+    def get_trip_schedules(self):
+        assert(self._access_token)
+
+        params = {
+            '_format': 'for_unbundled_itinerary',
+            '_limit': '10',
+            '_offset': '0',
+            'client_version': '3',
+            'exclude_free_time': 'false'
+        }
+
+        r = self._session.get(API_URL + '/trip_schedules', params=params)
+
+        r.raise_for_status()
+        return r.json()["trip_schedules"]
+
 
 if __name__ == "__main__":
     import doctest
