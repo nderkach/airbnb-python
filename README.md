@@ -27,6 +27,12 @@ import airbnb
 api = airbnb.Api(login, password)
 ```
 
+### Once you logged in, please use your access token, to avoid getting your account locked
+
+```python
+api = airbnb.Api(access_token=`<ACCESS_TOKEN_OBTAINED_ON_LOGIN>`)
+```
+
 ### Get you user profile
 
 ```python
@@ -68,9 +74,9 @@ Example:
 api.get_reviews(975964, offset=20, limit=20)
 ```
 
-### VerificationError (420)
+### 🌿 VerificationError (420)
 
-This exception occurs when you send too many login requests (i.e. call `Api()` with yout credentials).
+This exception occurs when you send too many login requests (i.e. call `Api()` with your credentials).
 Once you are logged in with your credentials you can just use your access token (`Api(access_token="<TOKEN>")`)
 As a workaround, try to login manually though the website or mobile app and complete Airbnb's verification process.
 You can also try to use a VPN or a proxy.
