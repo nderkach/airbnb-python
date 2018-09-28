@@ -82,4 +82,28 @@ As a workaround, try to login manually though the website or mobile app and comp
 You can also try to use a VPN or a proxy.
 
 
+### Testing
+
+The package has some dectests to test authentication process, to run the tests first export the following env variables:
+
+```bash
+export AIRBNB_LOGIN=`<YOUR_LOGIN>`
+export AIRBNB_PASSWORD=`<YOUR_PASSWORD>`
+export AIRBNB_ACCESS_TOKEN=`<ACCESS_TOKEN_OBTAINED_ON_LOGIN>`
+```
+
+Then, setup Python environment as follows:
+
+```bash
+pipenv shell
+pipenv install --dev
+```
+
+Finally, run the doctests using nose:
+
+```bash
+nosetests --with-doctest
+
+```
+
 [![Build Status](https://travis-ci.org/nderkach/airbnb-python.svg)](https://travis-ci.org/nderkach/airbnb-python)
