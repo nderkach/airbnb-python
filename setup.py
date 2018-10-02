@@ -4,7 +4,7 @@ import os
 from distutils.core import setup
 
 PROJECT = 'airbnb'
-VERSION = '2.1.3'
+VERSION = '2.1.4'
 URL = 'https://github.com/nderkach/airbnb-python'
 AUTHOR = 'Nikolay Derkach'
 AUTHOR_EMAIL = 'nderk@me.com'
@@ -43,6 +43,7 @@ setup(
         "Environment :: Console"
     ],
     install_requires=[
-        'requests'
+        'requests',
+        'python-dateutil'
     ]
 )
