@@ -241,8 +241,20 @@ class Api(object):
         for plan_id in past_scheduled_plan_ids:
             scheduled_plan = self.get_scheduled_plan(plan_id)
             reservation_id = scheduled_plan['events'][0]['destination']['reservation_key']
-            self.get_reservation(reservation_id)
+            past_reservations.append(self.get_reservation(reservation_id))
 
+        return past_reservations
+
+    def get_total_money_spent_in_usd(self):
+        reservations = self.get_all_past_reservations()
+
+        total_spent = 0.0
+        for reservation in reservations:
+            if reservation['total_price_formatted'].startswith('$'):
+                dollars_spent = reservation['total_price_formatted']
+                total_spent += float(dollars_spent[1:])
+
+        return total_spent
 
 if __name__ == "__main__":
     import doctest
