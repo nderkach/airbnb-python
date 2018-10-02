@@ -1,6 +1,7 @@
 import requests
 import json
 import datetime
+from dateutil.tz import tzlocal
 from airbnb.random_request import RandomRequest
 import os
 
@@ -98,6 +99,9 @@ class Api(object):
                 "x-airbnb-oauth-token": self._access_token
             })
 
+    def access_token(self):
+        return self._access_token
+
     def get_profile(self):
         assert(self._access_token)
 
@@ -187,6 +191,57 @@ class Api(object):
 
         r.raise_for_status()
         return r.json()["trip_schedules"]
+
+    def get_travel_plans(self, upcoming_scheduled_plans_limit=20, past_scheduled_plans_limit=8):
+        assert(self._access_token)
+
+        now = datetime.datetime.now(tzlocal())
+        strftime_date = now.strftime('%Y-%m-%dT%H:%M:%S%z')
+
+        params = {
+            'now': '{}:{}'.format(strftime_date[:-2], strftime_date[-2:]),
+            'upcoming_scheduled_plans_limit': upcoming_scheduled_plans_limit,
+            'past_scheduled_plans_limit': past_scheduled_plans_limit
+        }
+
+        r = self._session.get(API_URL + "/plans", params=params)
+        r.raise_for_status()
+
+        return r.json()['plans'][0]
+
+    def get_scheduled_plan(self, identifier):
+        assert(self._access_token)
+
+        params = {
+            '_format': 'for_trip_day_view'
+        }
+
+        r = self._session.get(API_URL + "/scheduled_plans/{}".format(identifier), params=params)
+        r.raise_for_status()
+
+        return r.json()['scheduled_plan']
+
+    def get_reservation(self, reservation_id):
+        assert(self._access_token)
+
+        params = {
+            '_format': 'for_trip_planner'
+        }
+
+        r = self._session.get(API_URL + "/reservations/{}".format(reservation_id), params=params)
+        r.raise_for_status()
+
+        return r.json()['reservation']
+
+
+    def get_all_past_reservations(self):
+        past_scheduled_plan_ids = self.get_travel_plans()['past_scheduled_plans']['metadata']['cache']['identifiers']
+
+        past_reservations = []
+        for plan_id in past_scheduled_plan_ids:
+            scheduled_plan = self.get_scheduled_plan(plan_id)
+            reservation_id = scheduled_plan['events'][0]['destination']['reservation_key']
+            self.get_reservation(reservation_id)
 
 
 if __name__ == "__main__":
