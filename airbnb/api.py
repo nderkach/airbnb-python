@@ -277,6 +277,20 @@ class Api(object):
 
         return r.json()
 
+    def get_listing_details(self, listing_id):
+        params = {
+            'adults': '0',
+            '_format': 'for_native',
+            'infants': '0',
+            'children': '0'
+        }
+
+        r = self._session.get(API_URL + '/pdp_listing_details/' + str(listing_id), params=params)
+        r.raise_for_status()
+
+        return r.json()
+
+
 if __name__ == "__main__":
     import doctest
     doctest.testmod()

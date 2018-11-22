@@ -93,6 +93,8 @@ Get first 8 listings for Lisbon, Portugal
 api.get_homes_with_query("Lisbon, Portugal")
 ```
 
+Note: at the moment `items_per_grid` limit appears to be *306* listings
+
 
 ### 🌿 VerificationError (420)
 
