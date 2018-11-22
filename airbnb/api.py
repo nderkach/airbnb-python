@@ -26,15 +26,15 @@ class VerificationError(AuthError):
 
 class Api(object):
     """ Base API class
-    >>> api = Api(os.environ.get("AIRBNB_LOGIN"), os.environ.get("AIRBNB_PASSWORD")) # doctest: +ELLIPSIS
-    Your access token: ...
+    >>> api = Api(access_token=os.environ.get("AIRBNB_ACCESS_TOKEN"))
     >>> api.get_profile() # doctest: +ELLIPSIS
     {...}
     >>> api.get_calendar(975964) # doctest: +ELLIPSIS
     {...}
     >>> api.get_reviews(975964) # doctest: +ELLIPSIS
     {...}
-    >>> api = Api(access_token=os.environ.get("AIRBNB_ACCESS_TOKEN"))
+    >>> api.get_homes_with_query("Lisbon, Portugal") # doctest: +ELLIPSIS
+    {...}
     """
 
     def __init__(self, username=None, password=None, access_token=None, api_key=API_KEY, session_cookie=None,
@@ -47,8 +47,6 @@ class Api(object):
             "content-type": "application/json",
             "x-airbnb-api-key": api_key,
             "user-agent": "Airbnb/18.38 AppVersion/18.38 iPhone/12.0 Type/Phone",
-            # "x-airbnb-device-id": "9120210f8fb1ae837affff54a0a2f64da821d227",
-            # "x-airbnb-advertising-id": "16CE6BF7-90CC-41A8-8305-B7B3183A2787",
             "x-airbnb-screensize": "w=375.00;h=812.00",
             "x-airbnb-carrier-name": "T-Mobile",
             "x-airbnb-network-type": "wifi",
@@ -255,6 +253,29 @@ class Api(object):
                 total_spent += float(dollars_spent[1:])
 
         return total_spent
+
+    def get_homes_with_query(self, query, offset=0, items_per_grid=8):
+        params = {
+            'is_guided_search': 'true',
+            'version': '1.3.9',
+            'section_offset': '0',
+            'query': query,
+            'items_offset': str(offset),
+            'adults': '0',
+            'screen_size': 'small',
+            'source': 'explore_tabs',
+            'items_per_grid': str(items_per_grid),
+            '_format': 'for_explore_search_native',
+            'metadata_only': 'false',
+            'refinement_paths[]': '/homes',
+            'timezone': 'Europe/Lisbon',
+            'satori_version': '1.0.7'
+        }
+
+        r = self._session.get(API_URL + '/explore_tabs', params=params)
+        r.raise_for_status()
+
+        return r.json()
 
 if __name__ == "__main__":
     import doctest

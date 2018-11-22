@@ -74,6 +74,26 @@ Example:
 api.get_reviews(975964, offset=20, limit=20)
 ```
 
+### Get a list of available homes in a `<City>` with a query
+
+```python
+api.get_homes_with_query(`<City>`)
+```
+
+Optional parameters:
+
+- `offset`: paging offset
+- `items_per_grid`: amount of listings to fetch for a given offset
+
+Example:
+
+Get first 8 listings for Lisbon, Portugal
+
+```python
+api.get_homes_with_query("Lisbon, Portugal")
+```
+
+
 ### 🌿 VerificationError (420)
 
 This exception occurs when you send too many login requests (i.e. call `Api()` with your credentials).
