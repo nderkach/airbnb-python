@@ -33,6 +33,7 @@ class Api(object):
     {...}
     >>> api.get_reviews(975964) # doctest: +ELLIPSIS
     {...}
+    >>> api = Api()
     >>> api.get_homes_with_query("Lisbon, Portugal") # doctest: +ELLIPSIS
     {...}
     """
@@ -74,8 +75,7 @@ class Api(object):
                 "x-airbnb-oauth-token": self._access_token
             })
 
-        else:
-            assert(username and password)
+        elif username and password:
             login_payload = {"email": username,
                              "password": password,
                              "type": "email"}
@@ -96,6 +96,9 @@ class Api(object):
             self._session.headers.update({
                 "x-airbnb-oauth-token": self._access_token
             })
+        else:
+            # no auth
+            pass
 
     def access_token(self):
         return self._access_token
