@@ -20,20 +20,31 @@ Usage:
 
     pip install airbnb
 
-### Initialize API with your airbnb.com username and password:
+### Initialize API
 
 ```python
 import airbnb
+api = airbnb.Api()
+```
+
+Now, you'd be able to access most of the API endpoints (which don't require authentication).
+
+### Initialize API with your airbnb.com username and password:
+
+You need to login to access certain endpoints requiring authentication:
+
+```python
 api = airbnb.Api(login, password)
 ```
 
-### Once you logged in, please use your access token, to avoid getting your account locked
+### Once you logged in, please reuse your access token, to avoid getting your account locked
 
 ```python
 api = airbnb.Api(access_token=`<ACCESS_TOKEN_OBTAINED_ON_LOGIN>`)
 ```
 
-### Get you user profile
+### Get your user profile
+#### (requires auth)
 
 ```python
 api.get_profile()
@@ -74,10 +85,11 @@ Example:
 api.get_reviews(975964, offset=20, limit=20)
 ```
 
-### Get a list of available homes in a `<City>` with a query
+### Get a list of available homes in a `<City>` with a query or at a given location
 
 ```python
-api.get_homes_with_query(`<City>`)
+api.get_homes(`<City>`)
+api.get_homes(gps_lat=`Latitude`, gps_lng=`Longitude`)
 ```
 
 Optional parameters:
@@ -90,7 +102,15 @@ Example:
 Get first 8 listings for Lisbon, Portugal
 
 ```python
-api.get_homes_with_query("Lisbon, Portugal")
+api.get_homes("Lisbon, Portugal")
+```
+
+Example:
+
+Get first listings at a given location (by GPS coordinates)
+
+```python
+api.get_homes(gps_lat=55.6123352, gps_lng=37.7117917)
 ```
 
 Note: at the moment `items_per_grid` limit appears to be *306* listings
@@ -106,7 +126,7 @@ You can also try to use a VPN or a proxy.
 
 ### Testing
 
-The package has some dectests to test authentication process, to run the tests first export the following env variables:
+The package has some doctests to test authentication process, to run the tests first export the following env variables:
 
 ```bash
 export AIRBNB_LOGIN=`<YOUR_LOGIN>`

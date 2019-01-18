@@ -58,7 +58,9 @@ class Api(object):
     >>> api.get_profile() # doctest: +ELLIPSIS
     {...}
     >>> api = Api()
-    >>> api.get_homes_with_query("Lisbon, Portugal") # doctest: +ELLIPSIS
+    >>> api.get_homes("Lisbon, Portugal") # doctest: +ELLIPSIS
+    {...}
+    >>> api.get_homes(gps_lat=55.6123352, gps_lng=37.7117917) # doctest: +ELLIPSIS
     {...}
     >>> api.get_calendar(975964) # doctest: +ELLIPSIS
     {...}
@@ -284,12 +286,16 @@ class Api(object):
 
     # Listing search
 
-    def get_homes_with_query(self, query, offset=0, items_per_grid=8):
+    def get_homes(self, query=None, gps_lat=None, gps_lng=None, offset=0, items_per_grid=8):
+        """
+        Search listings with
+            * Query (e.g. query="Lisbon, Portugal") or
+            * Location (e.g. gps_lat=55.6123352&gps_lng=37.7117917)
+        """
         params = {
             'is_guided_search': 'true',
             'version': '1.3.9',
             'section_offset': '0',
-            'query': query,
             'items_offset': str(offset),
             'adults': '0',
             'screen_size': 'small',
@@ -301,6 +307,16 @@ class Api(object):
             'timezone': 'Europe/Lisbon',
             'satori_version': '1.0.7'
         }
+
+        if not query and not (gps_lat and gps_lng):
+            raise MissingParameterError("Missing query or gps coordinates")
+
+        if query:
+            params['query'] = query
+
+        if gps_lat and gps_lng:
+            params['gps_lat'] = gps_lat
+            params['gps_lng'] = gps_lng
 
         r = self._session.get(API_URL + '/explore_tabs', params=params)
         r.raise_for_status()
