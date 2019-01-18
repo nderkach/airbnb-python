@@ -4,6 +4,7 @@ import datetime
 from dateutil.tz import tzlocal
 from airbnb.random_request import RandomRequest
 import os
+import functools
 
 
 API_URL = "https://api.airbnb.com/v2"
@@ -24,30 +25,58 @@ class VerificationError(AuthError):
     pass
 
 
+class MissingParameterError(Exception):
+    """
+    Missing parameter error
+    """
+    pass
+
+
+class MissingAccessTokenError(MissingParameterError):
+    """
+    Missing access token error
+    """
+    pass
+
+
+def require_auth(function):
+    """
+    A decorator that wraps the passed in function and raises exception
+    if access token is missing
+    """
+    @functools.wraps(function)
+    def wrapper(self, *args, **kwargs):
+        if not self.access_token():
+            raise MissingAccessTokenError
+        return function(self, *args, **kwargs)
+    return wrapper
+
+
 class Api(object):
     """ Base API class
     >>> api = Api(access_token=os.environ.get("AIRBNB_ACCESS_TOKEN"))
     >>> api.get_profile() # doctest: +ELLIPSIS
     {...}
+    >>> api = Api()
+    >>> api.get_homes_with_query("Lisbon, Portugal") # doctest: +ELLIPSIS
+    {...}
     >>> api.get_calendar(975964) # doctest: +ELLIPSIS
     {...}
     >>> api.get_reviews(975964) # doctest: +ELLIPSIS
-    {...}
-    >>> api = Api()
-    >>> api.get_homes_with_query("Lisbon, Portugal") # doctest: +ELLIPSIS
     {...}
     """
 
     def __init__(self, username=None, password=None, access_token=None, api_key=API_KEY, session_cookie=None,
                  proxy=None):
         self._session = requests.Session()
+        self._access_token = None
 
         self._session.headers = {
             "accept": "application/json",
-            "accept-encoding": "gzip, deflate",
+            "accept-encoding": "br, gzip, deflate",
             "content-type": "application/json",
             "x-airbnb-api-key": api_key,
-            "user-agent": "Airbnb/18.38 AppVersion/18.38 iPhone/12.0 Type/Phone",
+            "user-agent": "Airbnb/19.02 AppVersion/19.02 iPhone/12.1.2 Type/Phone",
             "x-airbnb-screensize": "w=375.00;h=812.00",
             "x-airbnb-carrier-name": "T-Mobile",
             "x-airbnb-network-type": "wifi",
@@ -103,17 +132,20 @@ class Api(object):
     def access_token(self):
         return self._access_token
 
+    @require_auth
     def get_profile(self):
-        assert(self._access_token)
-
+        """
+        Get my own profile
+        """
         r = self._session.get(API_URL + "/logins/me")
         r.raise_for_status()
 
         return r.json()
 
     def get_calendar(self, listing_id, starting_month=datetime.datetime.now().month, starting_year=datetime.datetime.now().year, calendar_months=12):
-        assert(self._access_token)
-
+        """
+        Get availability calendar for a given listing
+        """
         params = {
             'year': str(starting_year),
             'listing_id': str(listing_id),
@@ -128,8 +160,9 @@ class Api(object):
         return r.json()
 
     def get_reviews(self, listing_id, offset=0, limit=20):
-        assert(self._access_token)
-
+        """
+        Get reviews for a given listing
+        """
         params = {
             '_order': 'language_country',
             'listing_id': str(listing_id),
@@ -144,25 +177,14 @@ class Api(object):
 
         return r.json()
 
-    def get_listings(self, user_id, offset=0, limit=50):
-        assert(self._access_token)
 
-        params = {
-            'has_availability': 'true',
-            'format': 'v1_legacy_short',
-            'user_id': str(user_id),
-            '_limit': str(limit),
-            '_offset': str(offset)
-        }
+    # Host APIs
 
-        r = self._session.get(API_URL + "/listings", params=params)
-        r.raise_for_status()
-
-        return r.json()
-
+    @require_auth
     def get_listing_calendar(self, listing_id, starting_date=datetime.datetime.now(), calendar_months=6):
-        assert(self._access_token)
-
+        """
+        Get host availability calendar for a given listing
+        """
         params = {
             '_format': 'host_calendar_detailed'
         }
@@ -177,9 +199,10 @@ class Api(object):
 
         return r.json()
 
-    def get_trip_schedules(self):
-        assert(self._access_token)
+    # User past trips and stats
 
+    @require_auth
+    def get_trip_schedules(self):
         params = {
             '_format': 'for_unbundled_itinerary',
             '_limit': '10',
@@ -193,9 +216,8 @@ class Api(object):
         r.raise_for_status()
         return r.json()["trip_schedules"]
 
+    @require_auth
     def get_travel_plans(self, upcoming_scheduled_plans_limit=20, past_scheduled_plans_limit=8):
-        assert(self._access_token)
-
         now = datetime.datetime.now(tzlocal())
         strftime_date = now.strftime('%Y-%m-%dT%H:%M:%S%z')
 
@@ -210,6 +232,7 @@ class Api(object):
 
         return r.json()['plans'][0]
 
+    @require_auth
     def get_scheduled_plan(self, identifier):
         assert(self._access_token)
 
@@ -222,6 +245,7 @@ class Api(object):
 
         return r.json()['scheduled_plan']
 
+    @require_auth
     def get_reservation(self, reservation_id):
         assert(self._access_token)
 
@@ -234,7 +258,7 @@ class Api(object):
 
         return r.json()['reservation']
 
-
+    @require_auth
     def get_all_past_reservations(self):
         past_scheduled_plan_ids = self.get_travel_plans()['past_scheduled_plans']['metadata']['cache']['identifiers']
 
@@ -246,6 +270,7 @@ class Api(object):
 
         return past_reservations
 
+    @require_auth
     def get_total_money_spent_in_usd(self):
         reservations = self.get_all_past_reservations()
 
@@ -256,6 +281,8 @@ class Api(object):
                 total_spent += float(dollars_spent[1:])
 
         return total_spent
+
+    # Listing search
 
     def get_homes_with_query(self, query, offset=0, items_per_grid=8):
         params = {
