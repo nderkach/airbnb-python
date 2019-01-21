@@ -52,6 +52,18 @@ def require_auth(function):
     return wrapper
 
 
+def randomizable(function):
+    """
+    A decorator which randomizes requests if needed
+    """
+    @functools.wraps(function)
+    def wrapper(self, *args, **kwargs):
+        if self.randomize:
+            self.randomize_headers()
+        return function(self, *args, **kwargs)
+    return wrapper
+
+
 class Api(object):
     """ Base API class
     >>> api = Api(access_token=os.environ.get("AIRBNB_ACCESS_TOKEN"))
@@ -66,26 +78,35 @@ class Api(object):
     {...}
     >>> api.get_reviews(975964) # doctest: +ELLIPSIS
     {...}
+    >>> api = Api(randomize=True)
+    >>> api.get_listing_details(975964) # doctest: +ELLIPSIS
+    {...}
     """
 
     def __init__(self, username=None, password=None, access_token=None, api_key=API_KEY, session_cookie=None,
-                 proxy=None):
+                 proxy=None, randomize=None):
         self._session = requests.Session()
         self._access_token = None
+        self.user_agent = "Airbnb/19.02 AppVersion/19.02 iPhone/12.1.2 Type/Phone"
+        self.udid = "9120210f8fb1ae837affff54a0a2f64da821d227"
+        self.uuid = "C326397B-3A38-474B-973B-F022E6E4E6CC"
+        self.randomize = randomize
 
         self._session.headers = {
             "accept": "application/json",
             "accept-encoding": "br, gzip, deflate",
             "content-type": "application/json",
             "x-airbnb-api-key": api_key,
-            "user-agent": "Airbnb/19.02 AppVersion/19.02 iPhone/12.1.2 Type/Phone",
+            "user-agent": self.user_agent,
             "x-airbnb-screensize": "w=375.00;h=812.00",
             "x-airbnb-carrier-name": "T-Mobile",
             "x-airbnb-network-type": "wifi",
             "x-airbnb-currency": "USD",
             "x-airbnb-locale": "en",
             "x-airbnb-carrier-country": "us",
-            "accept-language": "en-us"
+            "accept-language": "en-us",
+            "airbnb-device-id": self.udid,
+            "x-airbnb-advertising-id": self.uuid
         }
 
         if proxy:
@@ -134,6 +155,23 @@ class Api(object):
     def access_token(self):
         return self._access_token
 
+    def set_user_agent(self, user_agent):
+        self.user_agent = user_agent
+        self._session.headers['user-agent'] = user_agent
+
+    def set_udid(self, udid):
+        self.udid = udid
+        self._session.headers['airbnb-device-id'] = udid
+
+    def set_uuid(self, uuid):
+        self.uuid = uuid
+        self._session.headers['x-airbnb-advertising-id'] = uuid
+
+    def randomize_headers(self):
+        self.set_user_agent(RandomRequest.get_random_user_agent())
+        self.set_udid(RandomRequest.get_random_udid())
+        self.set_uuid(RandomRequest.get_random_uuid())
+
     @require_auth
     def get_profile(self):
         """
@@ -144,6 +182,7 @@ class Api(object):
 
         return r.json()
 
+    @randomizable
     def get_calendar(self, listing_id, starting_month=datetime.datetime.now().month, starting_year=datetime.datetime.now().year, calendar_months=12):
         """
         Get availability calendar for a given listing
@@ -161,6 +200,7 @@ class Api(object):
 
         return r.json()
 
+    @randomizable
     def get_reviews(self, listing_id, offset=0, limit=20):
         """
         Get reviews for a given listing
@@ -173,6 +213,8 @@ class Api(object):
             '_limit': str(limit),
             '_format': 'for_mobile_client',
         }
+
+        print(self._session.headers)
 
         r = self._session.get(API_URL + "/reviews", params=params)
         r.raise_for_status()
@@ -286,6 +328,7 @@ class Api(object):
 
     # Listing search
 
+    @randomizable
     def get_homes(self, query=None, gps_lat=None, gps_lng=None, offset=0, items_per_grid=8):
         """
         Search listings with
@@ -323,6 +366,7 @@ class Api(object):
 
         return r.json()
 
+    @randomizable
     def get_listing_details(self, listing_id):
         params = {
             'adults': '0',

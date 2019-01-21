@@ -29,6 +29,15 @@ api = airbnb.Api()
 
 Now, you'd be able to access most of the API endpoints (which don't require authentication).
 
+### Use random client identification
+
+```python
+import airbnb
+api = airbnb.Api(randomize=True)
+```
+
+This will allow you to randomize device UDID, advertisement UUID and user agent.
+
 ### Initialize API with your airbnb.com username and password:
 
 You need to login to access certain endpoints requiring authentication:
