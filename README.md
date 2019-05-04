@@ -105,6 +105,8 @@ Optional parameters:
 
 - `offset`: paging offset
 - `items_per_grid`: amount of listings to fetch for a given offset
+- `checkin`: checkin date (e.g. `2019-04-20`)
+- `checkout`: checkout date (e.g. `2019-04-20`)
 
 Example:
 

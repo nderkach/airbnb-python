@@ -74,6 +74,8 @@ class Api(object):
     {...}
     >>> api.get_homes(gps_lat=55.6123352, gps_lng=37.7117917) # doctest: +ELLIPSIS
     {...}
+    >>> api.get_homes("Lisbon, Portugal", checkin=datetime.datetime.now().strftime("%Y-%m-%d"), checkout=(datetime.datetime.now() + datetime.timedelta(days=30)).strftime("%Y-%m-%d")) # doctest: +ELLIPSIS
+    {...}
     >>> api.get_calendar(975964) # doctest: +ELLIPSIS
     {...}
     >>> api.get_reviews(975964) # doctest: +ELLIPSIS
@@ -87,7 +89,7 @@ class Api(object):
                  proxy=None, randomize=None):
         self._session = requests.Session()
         self._access_token = None
-        self.user_agent = "Airbnb/19.02 AppVersion/19.02 iPhone/12.1.2 Type/Phone"
+        self.user_agent = "Airbnb/19.18 AppVersion/19.18 iPhone/12.2 Type/Phone"
         self.udid = "9120210f8fb1ae837affff54a0a2f64da821d227"
         self.uuid = "C326397B-3A38-474B-973B-F022E6E4E6CC"
         self.randomize = randomize
@@ -329,15 +331,19 @@ class Api(object):
     # Listing search
 
     @randomizable
-    def get_homes(self, query=None, gps_lat=None, gps_lng=None, offset=0, items_per_grid=8):
+    def get_homes(self, query=None, gps_lat=None, gps_lng=None, checkin=None, checkout=None, offset=0, items_per_grid=8):
         """
         Search listings with
             * Query (e.g. query="Lisbon, Portugal") or
             * Location (e.g. gps_lat=55.6123352&gps_lng=37.7117917)
+            * Check in/check out filters (e.g. checkin=2019-05-15&checkout=2019-05-20)
         """
         params = {
+            'toddlers': '0',
+            'adults': '0',
+            'infants': '0',
             'is_guided_search': 'true',
-            'version': '1.3.9',
+            'version': '1.4.8',
             'section_offset': '0',
             'items_offset': str(offset),
             'adults': '0',
@@ -348,7 +354,7 @@ class Api(object):
             'metadata_only': 'false',
             'refinement_paths[]': '/homes',
             'timezone': 'Europe/Lisbon',
-            'satori_version': '1.0.7'
+            'satori_version': '1.1.0'
         }
 
         if not query and not (gps_lat and gps_lng):
@@ -360,6 +366,10 @@ class Api(object):
         if gps_lat and gps_lng:
             params['gps_lat'] = gps_lat
             params['gps_lng'] = gps_lng
+
+        if checkin and checkout:
+            params['checkin'] = checkin
+            params['checkout'] = checkout
 
         r = self._session.get(API_URL + '/explore_tabs', params=params)
         r.raise_for_status()
