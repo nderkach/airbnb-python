@@ -364,8 +364,8 @@ class Api(object):
             params['query'] = query
 
         if gps_lat and gps_lng:
-            params['gps_lat'] = gps_lat
-            params['gps_lng'] = gps_lng
+            params['lat'] = gps_lat
+            params['lng'] = gps_lng
 
         if checkin and checkout:
             params['checkin'] = checkin
