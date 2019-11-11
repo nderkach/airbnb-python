@@ -346,7 +346,6 @@ class Api(object):
             'version': '1.4.8',
             'section_offset': '0',
             'items_offset': str(offset),
-            'adults': '0',
             'screen_size': 'small',
             'source': 'explore_tabs',
             'items_per_grid': str(items_per_grid),
