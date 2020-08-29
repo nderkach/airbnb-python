@@ -86,8 +86,9 @@ class Api(object):
     """
 
     def __init__(self, username=None, password=None, access_token=None, api_key=API_KEY, session_cookie=None,
-                 proxy=None, randomize=None):
+                 proxy=None, randomize=None, timeout=None):
         self._session = requests.Session()
+        self.timeout = timeout
         self._access_token = None
         self.user_agent = "Airbnb/19.18 AppVersion/19.18 iPhone/12.2 Type/Phone"
         self.udid = "9120210f8fb1ae837affff54a0a2f64da821d227"
@@ -135,7 +136,8 @@ class Api(object):
                              "type": "email"}
 
             r = self._session.post(
-                API_URL + "/logins", data=json.dumps(login_payload)
+                API_URL + "/logins", data=json.dumps(login_payload), 
+                timeout=self.timeout
             )
 
             if r.status_code == 420:
@@ -179,7 +181,7 @@ class Api(object):
         """
         Get my own profile
         """
-        r = self._session.get(API_URL + "/logins/me")
+        r = self._session.get(API_URL + "/logins/me", timeout=self.timeout)
         r.raise_for_status()
 
         return r.json()
