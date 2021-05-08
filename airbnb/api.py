@@ -10,6 +10,11 @@ import functools
 API_URL = "https://api.airbnb.com/v2"
 API_KEY = "915pw2pnf4h1aiguhph5gc5b2"
 
+DEFAULT_CURRENCY = "USD"
+DEFAULT_LOCALE = "en"
+DEFAULT_CARRIER_COUNTRY = "us"
+DEFAULT_LANGUAGE = "en-us"
+
 
 class AuthError(Exception):
     """
@@ -86,7 +91,8 @@ class Api(object):
     """
 
     def __init__(self, username=None, password=None, access_token=None, api_key=API_KEY, session_cookie=None,
-                 proxy=None, randomize=None):
+                 proxy=None, randomize=None, currency=DEFAULT_CURRENCY, locale=DEFAULT_LOCALE, 
+                 country=DEFAULT_CARRIER_COUNTRY, language=DEFAULT_LANGUAGE):
         self._session = requests.Session()
         self._access_token = None
         self.user_agent = "Airbnb/19.18 AppVersion/19.18 iPhone/12.2 Type/Phone"
@@ -103,10 +109,10 @@ class Api(object):
             "x-airbnb-screensize": "w=375.00;h=812.00",
             "x-airbnb-carrier-name": "T-Mobile",
             "x-airbnb-network-type": "wifi",
-            "x-airbnb-currency": "USD",
-            "x-airbnb-locale": "en",
-            "x-airbnb-carrier-country": "us",
-            "accept-language": "en-us",
+            "x-airbnb-currency": currency,
+            "x-airbnb-locale": locale,
+            "x-airbnb-carrier-country": country,
+            "accept-language": language,
             "airbnb-device-id": self.udid,
             "x-airbnb-advertising-id": self.uuid
         }
