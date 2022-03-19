@@ -400,6 +400,33 @@ class Api(object):
 
         return r.json()
 
+    @require_auth
+    def get_wishlist(self, wishlist_id):
+        """
+        Get a wishlist's primary information
+        """
+        r = self._session.get(API_URL + "/wishlists/" + wishlist_id)
+        r.raise_for_status()
+
+        return r.json()
+
+    @require_auth
+    def get_wishlist_listings(self, wishlist_id, offset=0, limit=100):
+        """
+        Get a wishlist's listings
+        """
+        params = {
+            'wishlist_id':str(wishlist_id),
+            '_format': 'for_collaborator',
+            '_offset': str(offset),
+            '_limit': str(limit)
+        }
+
+        r = self._session.get(API_URL + "/wishlisted_listings", params=params)
+        r.raise_for_status()
+
+        return r.json()
+
 
 if __name__ == "__main__":
     import doctest
