@@ -6,6 +6,14 @@ from airbnb.random_request import RandomRequest
 import os
 import functools
 
+"""
+TODO Backlog
+    They've launched api/v3 (see on browser network analyser)
+    get_details is 400 (bad req) with _format param, there are others which work
+    Get more API keys and randomize, find limitations (fake accounts?)
+    
+"""
+
 
 API_URL = "https://api.airbnb.com/v2"
 API_KEY = "915pw2pnf4h1aiguhph5gc5b2"
@@ -379,8 +387,10 @@ class Api(object):
     @randomizable
     def get_listing_details(self, listing_id):
         params = {
-            'adults': '0',
-            '_format': 'for_native',
+            'adults': '2',
+            #'_format' : 'for_web_dateless',
+            '_format': 'for_rooms_show', # most detailed format
+            #'_format': 'for_native',
             'infants': '0',
             'children': '0'
         }
